@@ -1,0 +1,50 @@
+logging:
+  level:
+    org.springframework: ERROR
+    org.hibernate: ERROR
+
+spring:
+  profiles:
+    active: dev
+  main:
+    banner-mode: off
+    lazy-initialization: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost/igtrader
+    username: yourpassword
+    password: yourpassword
+
+email: email@gmail.com
+thread-pool: 10
+
+#https://www:baeldung:com/cron-expressions:
+#  second> <minute> <hour> <day-of-month> <month> <day-of-week> <year> <command>
+# https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/support/CronSequenceGenerator.html
+job:
+  every:
+    #    4hours: '*/10 * * * * *'
+    #    4hours: '0 0 0,9,13,17 ? * MON-FRI'
+    #    1hour: '0 0 9-17 * * MON-FRI'
+    4hours: '0 0 0/2 ? * *'
+    1hour: '0 0 0-23 * * *'
+
+
+application:
+  ig:
+    endpoints:
+      base: https://demo-api.ig.com/gateway/deal/
+      session: https://demo-api.ig.com/gateway/deal/session
+      refresh-token: https://demo-api.ig.com/gateway/deal/session/refresh-token
+      encryption-key: https://demo-api.ig.com/gateway/deal/session/encryptionKey
+      market-search: https://demo-api.ig.com/gateway/deal/markets
+      market-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation
+      node-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation/
+      prices: https://demo-api.ig.com/gateway/deal/prices
+    credentials:
+      username: yourusername
+      password: yourpassword
+      apikeyname: userdemo-demo-key
+      api-key: aaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddd
+    account:
+      id: someaccount

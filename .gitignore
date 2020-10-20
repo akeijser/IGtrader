@@ -31,4 +31,4 @@ build/
 .vscode/
 
 ### Ignore application.yml containing passwords ###
-*.application.yml
+src/main/resources/application.yml

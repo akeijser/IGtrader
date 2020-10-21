@@ -1,11 +1,13 @@
 package com.akeijser.igtrader.igexternalapi
 
-import com.akeijser.igtrader.domainobjects.Epics
-import com.akeijser.igtrader.domainobjects.Instrument
-import com.akeijser.igtrader.domainobjects.Markets
-import com.akeijser.igtrader.domainobjects.MultipleEpicDetails
+import com.akeijser.igtrader.domain.Epics
+import com.akeijser.igtrader.domain.Instrument
+import com.akeijser.igtrader.domain.Markets
+import com.akeijser.igtrader.domain.MultipleEpicDetails
 import com.akeijser.igtrader.repository.MarketsRepository
 import com.google.gson.Gson
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.net.http.HttpClient
@@ -24,6 +26,11 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
      *  Forex
      *  Cryptocurrency
      */
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(MarketsClient::class.java)
+    }
+
     fun getMarkets(): Markets {
 
         val session = Session.getSession(loginClient)
@@ -38,6 +45,10 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200 ){
+            LOGGER.info("get markets response headers: ${response.headers()}")
+            LOGGER.info("get markets response body: ${response.body()}")
+        }
         return Gson().fromJson(response.body(), MultiNodesDTO::class.java).toMarkets()
     }
 
@@ -57,6 +68,10 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200 ){
+            LOGGER.info("get epics for marketId: ${marketId} response headers: ${response.headers()}")
+            LOGGER.info("get epics for marketId: ${marketId} response body: ${response.body()}")
+        }
         return Gson().fromJson(response.body(), MultiNodesDTO::class.java).toEpics()
     }
 
@@ -88,6 +103,10 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200 ){
+            LOGGER.info("get epic details response headers: ${response.headers()}")
+            LOGGER.info("get epic details response body: ${response.body()}")
+        }
         return Gson().fromJson(response.body(), MultipleEpicDetailsDTO::class.java).toDomain()
     }
 
@@ -95,13 +114,6 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
         val instrument = marketsRepository.findInstrument(epic)
         return instrument?.let{ instrument } ?: run {
             return getEpicDetails(epic).multipleEpicDetails?.get(0)?.instrument
-        }
-    }
-
-    fun getInstrumentId(epic: String): UUID? {
-        val instrument = marketsRepository.findInstrument(epic)
-        return instrument?.let{ instrument.id } ?: run {
-            return getEpicDetails(epic).multipleEpicDetails?.get(0)?.instrument?.id
         }
     }
 }

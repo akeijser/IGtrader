@@ -1,5 +1,7 @@
 package com.akeijser.igtrader.repository
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import javax.persistence.EntityManager
 import javax.persistence.Persistence
@@ -8,6 +10,10 @@ import javax.transaction.Transactional
 
 @Repository
 class PricesRepository(private val marketsRepository: MarketsRepository) {
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(PricesRepository::class.java)
+    }
 
     private val em: EntityManager = Persistence
             .createEntityManagerFactory("persistenceUnitName")
@@ -20,7 +26,7 @@ class PricesRepository(private val marketsRepository: MarketsRepository) {
             em.transaction.begin()
 
             //Since priceDetailsDBO.instrument is manyToOne we have to make sure its in the  persistence context
-            //todo: not to happy with an Instrument insert in the PricesRepository, this should not be required imo
+            //todo: not to happy with an Instrument insert in the PricesRepository, this should not be required
             if (priceDetailsDBO.instrument.id == null) {
                 priceDetailsDBO.instrument = em.getReference(InstrumentDBO::class.java, marketsRepository.insertInstrument(priceDetailsDBO.instrument).id)
             } else {
@@ -31,8 +37,7 @@ class PricesRepository(private val marketsRepository: MarketsRepository) {
             em.transaction.commit()
             em.clear()
         } catch (e: PersistenceException) {
-            println("Error persisting priceDetails${e.message}")
-            //todo fix logging
+            LOGGER.error("error inserting price details${e.localizedMessage}")
             em.clear()
         }
     }

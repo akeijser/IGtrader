@@ -1,11 +1,12 @@
 package com.akeijser.igtrader.igexternalapi
 
-import com.akeijser.igtrader.domainobjects.Instrument
-import com.akeijser.igtrader.domainobjects.PricesDetails
+import com.akeijser.igtrader.domain.PricesDetails
 import com.akeijser.igtrader.repository.InstrumentDBO
 import com.akeijser.igtrader.repository.MarketsRepository
 import com.akeijser.igtrader.utils.toInstantWithDefaultZondeId
 import com.google.gson.Gson
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.net.http.HttpClient
@@ -17,8 +18,12 @@ import java.time.format.DateTimeFormatter
 
 @Component
 class PricesClient(private val loginClient: LoginClient, private val marketsClient: MarketsClient, private val marketsRepository: MarketsRepository) {
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(PricesClient::class.java)
+    }
+
     fun prices(epic: String, resolution: ResolutionDTO = ResolutionDTO.MINUTE, dataPoints: Int = 10): List<PricesDetails>?{
-        //todo  log error, for example: wrong epic name
         val instrument = marketsRepository.findInstrument(epic) ?: marketsClient.getInstrument(epic) ?.let { marketsRepository.insertInstrument(InstrumentDBO(it)) } ?: return null
 
         val session = Session.getSession(loginClient)
@@ -35,8 +40,10 @@ class PricesClient(private val loginClient: LoginClient, private val marketsClie
                 .header("IG-ACCOUNT-ID", session.accountId)
                 .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        println(response.body())
-
+        if (response.statusCode() != 200 ){
+            LOGGER.info("get prices for epic ${epic} response headers: ${response.headers()}")
+            LOGGER.info("get prices for epic ${epic} response body: ${response.body()}")
+        }
         val pricesDTO = Gson().fromJson(response.body(), PricesDTO::class.java)
 
         return pricesDTO.pricesDetails?.map { PricesDetails(instrument, it) }?.toList()
@@ -70,7 +77,12 @@ class PricesClient(private val loginClient: LoginClient, private val marketsClie
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        println(response.body())
+
+        if (response.statusCode() != 200 ){
+            LOGGER.info("get prices for epic ${epic} response headers: ${response.headers()}")
+            LOGGER.info("get prices for epic ${epic} response body: ${response.body()}")
+        }
+
         val pricesDTO = Gson().fromJson(response.body(), PricesDTO::class.java)
 
         return pricesDTO.pricesDetails?.map { PricesDetails(instrument, it) }?.toList()

@@ -1,6 +1,6 @@
 package com.akeijser.igtrader.repository
 
-import com.akeijser.igtrader.domainobjects.*
+import com.akeijser.igtrader.domain.*
 import org.springframework.data.util.ProxyUtils
 import java.io.Serializable
 import java.util.*

@@ -2,6 +2,8 @@ package com.akeijser.igtrader.igexternalapi
 
 import com.akeijser.igtrader.configuration.ApplicationConfig
 import com.google.gson.Gson
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.net.http.HttpClient
@@ -11,6 +13,10 @@ import java.net.http.HttpResponse
 
 @Component
 class LoginClient(val config: ApplicationConfig) {
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(LoginClient::class.java)
+    }
 
     fun oAuthLogin(): OauthResponse {
 
@@ -24,6 +30,9 @@ class LoginClient(val config: ApplicationConfig) {
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200) {
+            LOGGER.info("oAuth Login response status code ${response.statusCode()}")
+        }
         return Gson().fromJson(response.body(), OauthResponse::class.java) as OauthResponse
     }
 
@@ -38,6 +47,9 @@ class LoginClient(val config: ApplicationConfig) {
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200) {
+            LOGGER.info("oAuth refresh token response status code ${response.statusCode()}")
+        }
         return Gson().fromJson(response.body(), OauthToken::class.java)
     }
 }

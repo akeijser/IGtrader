@@ -4,11 +4,17 @@ import com.akeijser.igtrader.igexternalapi.LoginClient
 import com.akeijser.igtrader.igexternalapi.MarketsClient
 import org.junit.jupiter.api.Test
 import com.akeijser.igtrader.AbstractFeatureTest
-import com.akeijser.igtrader.domainobjects.Instrument
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import org.springframework.beans.factory.annotation.Autowired
+import javax.persistence.PersistenceException
 
 internal class MarketsRepositoryImplementationTest: AbstractFeatureTest() {
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(MarketsRepository::class.java)
+    }
 
     @Autowired
     private val loginClient = LoginClient(config)
@@ -46,9 +52,12 @@ internal class MarketsRepositoryImplementationTest: AbstractFeatureTest() {
         val epicDetails = marketsClient.getEpicDetails("CS.D.BITCOIN.CFD.IP")
         val instrument = epicDetails.multipleEpicDetails?.get(0)?.instrument
         if (instrument != null) {
-            val instrumentDBO = InstrumentDBO(instrument)
-            marketRepository.insertInstrument(instrumentDBO)
+            try {
+                val instrumentDBO = InstrumentDBO(instrument)
+                marketRepository.insertInstrument(instrumentDBO)
+            } catch (e: PersistenceException) {
+                LOGGER.error(e.localizedMessage)
+            }
         }
-        println("bbalbalbablablad${marketRepository.findInstrument("CS.D.BITCOIN.CFD.IP").toString()}")
     }
 }

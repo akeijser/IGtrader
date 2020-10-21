@@ -1,6 +1,8 @@
 package com.akeijser.igtrader.repository
 
-import com.akeijser.igtrader.domainobjects.Instrument
+import com.akeijser.igtrader.domain.Instrument
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -12,18 +14,21 @@ import javax.persistence.PersistenceException
 @Repository
 class MarketsRepository {
 
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(MarketsRepository::class.java)
+    }
+
     private val em: EntityManager = Persistence
             .createEntityManagerFactory("persistenceUnitName")
             .createEntityManager()
 
-    //todo add log
     fun insertMarket(market: MarketDBO) {
         try {
             em.transaction.begin()
             em.persist(market)
             em.transaction.commit()
         } catch (e: PersistenceException) {
-            println(e.message)
+            LOGGER.error("error inserting market ${e.localizedMessage}")
         }
     }
 
@@ -33,7 +38,7 @@ class MarketsRepository {
             em.persist(epic)
             em.transaction.commit()
         } catch (e: PersistenceException) {
-            println(e.message)
+            LOGGER.error("error inserting epic ${e.localizedMessage}")
         }
     }
 
@@ -43,7 +48,7 @@ class MarketsRepository {
             em.persist(epicDetailsDBO)
             em.transaction.commit()
         } catch (e: PersistenceException) {
-            println(e.message)
+            LOGGER.error("error inserting epic details ${e.localizedMessage}")
         }
     }
 
@@ -54,6 +59,8 @@ class MarketsRepository {
                     .singleResult
             Instrument(instrumentDBO)
         } catch (n: NoResultException) {
+            LOGGER.info(n.localizedMessage)
+            LOGGER.error("instrument not found exception ${n.localizedMessage}")
             null
         }
     }
@@ -65,8 +72,9 @@ class MarketsRepository {
             em.transaction.commit()
             Instrument(instrumentDBO)
         } catch (e: PersistenceException) {
-            println(e.message)
+            LOGGER.error("error inserting an instrument ${e.localizedMessage}")
             throw e
         }
     }
 }
+

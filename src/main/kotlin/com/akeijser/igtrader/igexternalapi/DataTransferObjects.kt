@@ -1,6 +1,6 @@
 package com.akeijser.igtrader.igexternalapi
 
-import com.akeijser.igtrader.domainobjects.*
+import com.akeijser.igtrader.domain.*
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 

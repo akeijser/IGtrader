@@ -30,6 +30,4 @@ internal class PricesClientTest: AbstractFeatureTest() {
     fun pricesTestLocalDateTime(){
         println(pricesClient.prices("CS.D.BITCOIN.CFD.IP", ResolutionDTO.HOUR, LocalDateTime.now().minusDays(1), LocalDateTime.now()))
     }
-
-    //todo generate one more test for missing call
 }

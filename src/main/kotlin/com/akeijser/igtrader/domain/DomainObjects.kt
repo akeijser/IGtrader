@@ -1,4 +1,4 @@
-package com.akeijser.igtrader.domainobjects
+package com.akeijser.igtrader.domain
 
 import com.akeijser.igtrader.igexternalapi.*
 import com.akeijser.igtrader.repository.*

@@ -9,7 +9,6 @@ internal class SessionImplTest: AbstractFeatureTest(){
     @Autowired
     val loginWebServiceClient = LoginClient(config)
 
-
     @Test
     fun getSessionTest(){
         println(Session.getSession(loginWebServiceClient))

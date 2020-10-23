@@ -36,7 +36,7 @@ class LoginClient(val config: ApplicationConfig) {
         return Gson().fromJson(response.body(), OauthResponse::class.java) as OauthResponse
     }
 
-    fun refreshToken(refreshToken: String): OauthToken {
+    fun refreshOAuthToken(refreshToken: String): OauthToken {
 
         val json = Gson().toJson(RefreshToken(refreshToken))
         val client = HttpClient.newBuilder().build()

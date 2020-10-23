@@ -13,7 +13,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.*
 
 @Component
 class MarketsClient(private val loginClient: LoginClient, private val marketsRepository: MarketsRepository) {
@@ -33,7 +32,7 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
 
     fun getMarkets(): Markets {
 
-        val session = Session.getSession(loginClient)
+        val session = RestSession.getSession(loginClient)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
@@ -56,7 +55,7 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
      * find all epics for a single market. An Epic is the specific, tradable "stock"
      */
     fun getEpicsForMarket(marketId: Int): Epics {
-        val session = Session.getSession(loginClient)
+        val session = RestSession.getSession(loginClient)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
@@ -90,7 +89,7 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
 
         val uriParameters = "?epics=${epics.joinToString(separator = "%2C", transform = {it.replace(" ", "")})}&filter=${filter.name}"
 
-        val session = Session.getSession(loginClient)
+        val session = RestSession.getSession(loginClient)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()

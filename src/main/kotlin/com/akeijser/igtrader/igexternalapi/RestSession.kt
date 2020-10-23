@@ -2,7 +2,7 @@ package com.akeijser.igtrader.igexternalapi
 
 import java.time.LocalDateTime
 
-object Session{
+object RestSession{
     private var oAuthResponse: OauthResponse? = null
 
     fun getSession(loginClient: LoginClient): OauthResponse {
@@ -22,7 +22,7 @@ object Session{
         }
 
         //Get new token with refresh token
-        instance.oauthToken = loginClient.refreshToken(instance.oauthToken.refresh_token)
+        instance.oauthToken = loginClient.refreshOAuthToken(instance.oauthToken.refresh_token)
         instance.oauthToken.setExpiresDateTime()
         oAuthResponse = instance
         return oAuthResponse as OauthResponse

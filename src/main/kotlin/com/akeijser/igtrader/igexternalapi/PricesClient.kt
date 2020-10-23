@@ -26,7 +26,7 @@ class PricesClient(private val loginClient: LoginClient, private val marketsClie
     fun prices(epic: String, resolution: ResolutionDTO = ResolutionDTO.MINUTE, dataPoints: Int = 10): List<PricesDetails>?{
         val instrument = marketsRepository.findInstrument(epic) ?: marketsClient.getInstrument(epic) ?.let { marketsRepository.insertInstrument(InstrumentDBO(it)) } ?: return null
 
-        val session = Session.getSession(loginClient)
+        val session = RestSession.getSession(loginClient)
         val uriParameters = "${epic}/${resolution}/${dataPoints}"
         println("${loginClient.config.ig.endpoints.prices}/${uriParameters}")
         val client = HttpClient.newBuilder().build()
@@ -62,7 +62,7 @@ class PricesClient(private val loginClient: LoginClient, private val marketsClie
     fun prices(epic: String, resolution: ResolutionDTO = ResolutionDTO.MINUTE, startDate: String, endDate: String): List<PricesDetails>? {
         val instrument = marketsClient.getInstrument(epic) ?: return null
 
-        val session = Session.getSession(loginClient)
+        val session = RestSession.getSession(loginClient)
         val uriParameters = "${epic}?resolution=${resolution}&from${startDate}&to${endDate}"
 
         val client = HttpClient.newBuilder().build()

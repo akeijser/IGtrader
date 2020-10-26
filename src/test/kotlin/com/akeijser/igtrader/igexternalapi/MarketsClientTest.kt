@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired
 internal class MarketsClientImplTest: AbstractFeatureTest() {
 
     @Autowired
-    private val loginClient = LoginClient(config)
-    @Autowired
     private val marketRepository = MarketsRepository()
     @Autowired
-    private val marketsClient = MarketsClient(loginClient, marketRepository)
+    private val marketsClient = MarketsClient(config, marketRepository)
 
     @Test
     fun browseMarkets() {

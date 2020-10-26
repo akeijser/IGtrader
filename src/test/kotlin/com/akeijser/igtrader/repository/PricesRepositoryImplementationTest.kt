@@ -1,7 +1,6 @@
 package com.akeijser.igtrader.repository
 
 import com.akeijser.igtrader.AbstractFeatureTest
-import com.akeijser.igtrader.igexternalapi.LoginClient
 import com.akeijser.igtrader.igexternalapi.MarketsClient
 import com.akeijser.igtrader.igexternalapi.PricesClient
 import com.akeijser.igtrader.igexternalapi.ResolutionDTO
@@ -9,17 +8,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class PricesRepositoryImplementationTest : AbstractFeatureTest() {
-    @Autowired
-    private val loginClient = LoginClient(config)
 
     @Autowired
     private val marketRepository = MarketsRepository()
 
     @Autowired
-    private val marketsClient = MarketsClient(loginClient, marketRepository)
+    private val marketsClient = MarketsClient(config, marketRepository)
 
     @Autowired
-    private val pricesClient = PricesClient(loginClient, marketsClient, marketRepository)
+    private val pricesClient = PricesClient(config, marketsClient, marketRepository)
 
     @Autowired
     private val pricesRepository = PricesRepository(marketRepository)

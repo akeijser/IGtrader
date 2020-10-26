@@ -43,6 +43,9 @@ class ApplicationConfig {
 
             @NotBlank
             lateinit var prices: String
+
+            @NotBlank
+            lateinit var streamToken: String
         }
 
         @Valid

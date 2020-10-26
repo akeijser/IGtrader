@@ -479,3 +479,5 @@ data class RefreshToken (
         @SerializedName("refresh_token")
         val refreshToken: String
 )
+
+data class StreamTokens(val cst: String, val xSecurityToken: String, val streamEndpoint: String)

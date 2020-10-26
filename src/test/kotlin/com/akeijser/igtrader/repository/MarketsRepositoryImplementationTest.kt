@@ -1,6 +1,5 @@
 package com.akeijser.igtrader.repository
 
-import com.akeijser.igtrader.igexternalapi.LoginClient
 import com.akeijser.igtrader.igexternalapi.MarketsClient
 import org.junit.jupiter.api.Test
 import com.akeijser.igtrader.AbstractFeatureTest
@@ -17,11 +16,9 @@ internal class MarketsRepositoryImplementationTest: AbstractFeatureTest() {
     }
 
     @Autowired
-    private val loginClient = LoginClient(config)
-    @Autowired
     private val marketRepository = MarketsRepository()
     @Autowired
-    private val marketsClient = MarketsClient(loginClient, marketRepository)
+    private val marketsClient = MarketsClient(config, marketRepository)
 
     @Test
     fun insertMarketImplTest() {

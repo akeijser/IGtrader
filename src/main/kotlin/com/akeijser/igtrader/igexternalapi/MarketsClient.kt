@@ -1,5 +1,6 @@
 package com.akeijser.igtrader.igexternalapi
 
+import com.akeijser.igtrader.configuration.ApplicationConfig
 import com.akeijser.igtrader.domain.Epics
 import com.akeijser.igtrader.domain.Instrument
 import com.akeijser.igtrader.domain.Markets
@@ -15,7 +16,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 @Component
-class MarketsClient(private val loginClient: LoginClient, private val marketsRepository: MarketsRepository) {
+class MarketsClient(private val config: ApplicationConfig, private val marketsRepository: MarketsRepository) {
 
     /**
      * find all Markets. A Markets is a specific catagory of the overal stockmarket
@@ -32,13 +33,13 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
 
     fun getMarkets(): Markets {
 
-        val session = RestSession.getSession(loginClient)
+        val session = RestSession.getOAuthDetails(config)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
-                .uri(URI.create(loginClient.config.ig.endpoints.marketNavigation))
+                .uri(URI.create(config.ig.endpoints.marketNavigation))
                 .header("Content-Type",  "application/json; charset=UTF-8")
-                .header("X-IG-API-KEY", loginClient.config.ig.credentials.apiKey)
+                .header("X-IG-API-KEY", config.ig.credentials.apiKey)
                 .header("IG-ACCOUNT-ID", session.accountId)
                 .header("Authorization", "${session.oauthToken.token_type} ${session.oauthToken.access_token}")
                 .build()
@@ -55,21 +56,21 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
      * find all epics for a single market. An Epic is the specific, tradable "stock"
      */
     fun getEpicsForMarket(marketId: Int): Epics {
-        val session = RestSession.getSession(loginClient)
+        val session = RestSession.getOAuthDetails(config)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
-                .uri(URI.create("${loginClient.config.ig.endpoints.nodeNavigation}$marketId"))
+                .uri(URI.create("${config.ig.endpoints.nodeNavigation}$marketId"))
                 .header("Content-Type",  "application/json; charset=UTF-8")
-                .header("X-IG-API-KEY", loginClient.config.ig.credentials.apiKey)
+                .header("X-IG-API-KEY", config.ig.credentials.apiKey)
                 .header("IG-ACCOUNT-ID", session.accountId)
                 .header("Authorization", "${session.oauthToken.token_type} ${session.oauthToken.access_token}")
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         if (response.statusCode() != 200 ){
-            LOGGER.info("get epics for marketId: ${marketId} response headers: ${response.headers()}")
-            LOGGER.info("get epics for marketId: ${marketId} response body: ${response.body()}")
+            LOGGER.info("get epics for marketId: $marketId response headers: ${response.headers()}")
+            LOGGER.info("get epics for marketId: $marketId response body: ${response.body()}")
         }
         return Gson().fromJson(response.body(), MultiNodesDTO::class.java).toEpics()
     }
@@ -89,13 +90,13 @@ class MarketsClient(private val loginClient: LoginClient, private val marketsRep
 
         val uriParameters = "?epics=${epics.joinToString(separator = "%2C", transform = {it.replace(" ", "")})}&filter=${filter.name}"
 
-        val session = RestSession.getSession(loginClient)
+        val session = RestSession.getOAuthDetails(config)
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
-                .uri(URI.create("${loginClient.config.ig.endpoints.marketSearch}${uriParameters}"))
+                .uri(URI.create("${config.ig.endpoints.marketSearch}${uriParameters}"))
                 .header("Content-Type",  "application/json; charset=UTF-8")
-                .header("X-IG-API-KEY", loginClient.config.ig.credentials.apiKey)
+                .header("X-IG-API-KEY", config.ig.credentials.apiKey)
                 .header("Version", "2")
                 .header("Authorization", "${session.oauthToken.token_type} ${session.oauthToken.access_token}")
                 .header("IG-ACCOUNT-ID", session.accountId)

@@ -87,6 +87,17 @@ object RestSession{
                 .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() == 400) {
+            LOGGER.warn("Could not connect to /session. Check credentials in application-credentials.yml ")
+            throw IGSessionExceptions(response.statusCode())
+        }
+
+        if (response.statusCode() == 403) {
+            LOGGER.warn("Could not connect to /session. Check api-key in application-credentials.yml ")
+            throw IGSessionExceptions(response.statusCode())
+        }
+
         if (response.statusCode() != 200) {
             throw IGSessionExceptions(response.statusCode())
         }

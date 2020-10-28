@@ -12,12 +12,14 @@ object StreamSession {
     private lateinit var lsClient : LightstreamerClient
     private lateinit var streamTokens: StreamTokens
 
+    @Throws(IGSessionExceptions::class)
     fun connect(config: ApplicationConfig): LightstreamerClient{
 
         try {
             streamTokens = RestSession.getStreamTokens(config)
         } catch (e: IGSessionExceptions){
             LOGGER.info("Failed to get streamTokens. ${e.message}")
+            throw e
         }
 
         lsClient = LightstreamerClient(streamTokens.streamEndpoint, "DEMO")

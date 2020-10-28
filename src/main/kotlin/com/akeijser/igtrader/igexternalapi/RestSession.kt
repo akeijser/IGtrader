@@ -71,6 +71,17 @@ object RestSession{
                     , streamEndpoint = session.lightstreamerEndpoint
             )
         }
+
+        if (response.statusCode() == 400) {
+            LOGGER.warn("Could not connect to /fetchSessionTokens. Check credentials in application-credentials.yml ")
+            throw IGSessionExceptions(response.statusCode())
+        }
+
+        if (response.statusCode() == 403) {
+            LOGGER.warn("Could not connect to /fetchSessionTokens. Check api-key in application-credentials.yml ")
+            throw IGSessionExceptions(response.statusCode())
+        }
+
         throw IGSessionExceptions(response.statusCode())
     }
 

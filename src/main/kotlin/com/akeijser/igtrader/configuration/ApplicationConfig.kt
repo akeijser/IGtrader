@@ -20,14 +20,9 @@ class ApplicationConfig {
 
         @ConfigurationProperties(prefix = "endpoints")
         class Endpoints{
-            @NotBlank
-            lateinit var base: String
 
             @NotBlank
             lateinit var session: String
-
-            @NotBlank
-            lateinit var encryptionKey: String
 
             @NotBlank
             lateinit var marketNavigation: String
@@ -61,10 +56,6 @@ class ApplicationConfig {
 
             @NotBlank
             lateinit var password: String
-
-            @NotBlank
-            lateinit var apikeyname: String
-
         }
 
         @Valid

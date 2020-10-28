@@ -35,10 +35,8 @@ job:
 application:
   ig:
     endpoints:
-      base: https://demo-api.ig.com/gateway/deal/
       session: https://demo-api.ig.com/gateway/deal/session
       refresh-token: https://demo-api.ig.com/gateway/deal/session/refresh-token
-      encryption-key: https://demo-api.ig.com/gateway/deal/session/encryptionKey
       market-search: https://demo-api.ig.com/gateway/deal/markets
       market-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation
       node-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation/

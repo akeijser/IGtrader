@@ -18,7 +18,7 @@ object RestSession{
     private lateinit var config: ApplicationConfig
 
 
-    //todo change to get SessionTokens instead of OAuthResponse
+    @Throws(IGSessionExceptions::class)
     fun getOAuthDetails(config: ApplicationConfig): OauthResponse {
         this.config = config
 
@@ -28,6 +28,7 @@ object RestSession{
                 oAuthResponse = oAuthLogin()
             } catch (e: IGSessionExceptions) {
                 LOGGER.info("Failed to do OAuth Login. ${e.message}")
+                throw e
             }
             oAuthResponse.oauthToken.setExpiresDateTime()
             return oAuthResponse

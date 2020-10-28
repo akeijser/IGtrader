@@ -1,3 +1,5 @@
+spring.profiles.include: 'credentials'
+
 logging:
   level:
     org.springframework: ERROR
@@ -12,10 +14,10 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost/igtrader
-    username: yourpassword
-    password: yourpassword
+    username: postgres
+    password: postgres
 
-email: email@gmail.com
+email: akeijser@gmail.com
 thread-pool: 10
 
 #https://www:baeldung:com/cron-expressions:
@@ -41,10 +43,6 @@ application:
       market-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation
       node-navigation: https://demo-api.ig.com/gateway/deal/marketnavigation/
       prices: https://demo-api.ig.com/gateway/deal/prices
-    credentials:
-      username: yourusername
-      password: yourpassword
-      apikeyname: userdemo-demo-key
-      api-key: aaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddd
+      stream-token: https://demo-api.ig.com/gateway/deal/session?fetchSessionTokens=true
     account:
-      id: someaccount
+      id: Z3AFFA

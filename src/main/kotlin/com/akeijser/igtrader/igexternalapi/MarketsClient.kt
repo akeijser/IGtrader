@@ -6,6 +6,7 @@ import com.akeijser.igtrader.domain.Instrument
 import com.akeijser.igtrader.domain.Markets
 import com.akeijser.igtrader.domain.MultipleEpicDetails
 import com.akeijser.igtrader.repository.MarketsRepository
+import com.akeijser.igtrader.utils.IGSessionExceptions
 import com.google.gson.Gson
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,8 +33,13 @@ class MarketsClient(private val config: ApplicationConfig, private val marketsRe
     }
 
     fun getMarkets(): Markets {
-
-        val session = RestSession.getOAuthDetails(config)
+        val session: OauthResponse
+        try {
+             session = RestSession.getOAuthDetails(config)
+        } catch (e : IGSessionExceptions) {
+            LOGGER.info("could not getMarkets because: ${e.message}")
+            throw e
+        }
 
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()

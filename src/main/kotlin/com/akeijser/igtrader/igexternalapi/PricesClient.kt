@@ -29,7 +29,6 @@ class PricesClient(private val config: ApplicationConfig, private val marketsCli
 
         val session = RestSession.getOAuthDetails(config)
         val uriParameters = "${epic}/${resolution}/${dataPoints}"
-        println("${config.ig.endpoints.prices}/${uriParameters}")
         val client = HttpClient.newBuilder().build()
 
         val request = HttpRequest.newBuilder()

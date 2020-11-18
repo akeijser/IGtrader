@@ -16,6 +16,9 @@ spring:
     url: jdbc:postgresql://localhost/igtrader
     username: postgres
     password: postgres
+  jpa:
+    generate-ddl: true
+
 
 email: akeijser@gmail.com
 thread-pool: 10

@@ -1,7 +1,8 @@
 package com.akeijser.igtrader.domain
 
-import com.akeijser.igtrader.igexternalapi.*
-import com.akeijser.igtrader.repository.*
+import com.akeijser.igtrader.dbo.*
+import com.akeijser.igtrader.dto.*
+import java.time.LocalDateTime
 import java.util.*
 
 data class MarketNavigation (
@@ -10,26 +11,28 @@ data class MarketNavigation (
 )
 
 data class Markets (
-        val markets: List<Market>?
+        val markets: List<Market>
 )
 
 data class Market (
-        val id: Int?,
-        val name: String?
+        val id: Int,
+        val name: String
 ) {
-    fun toDBO(): MarketDBO {
-        return MarketDBO(id, name)
-    }
+    constructor(marketDBO : MarketDBO): this (
+            id = marketDBO.id
+            , name = marketDBO.name
+    )
 }
 
+//todo can we get rid of this?
 data class Epics (
         val nodes : List<Epic>?
 
 )
 
 data class Epic(
-        val name : String?,
-        val marketId : Int?
+        val name : String,
+        val marketId : Int
 ) {
     fun toDBO(): EpicDBO {
         return EpicDBO(name, marketId)
@@ -54,25 +57,15 @@ data class EpicNode(
 
 data class MultipleEpicDetails (
 
-        val multipleEpicDetails : List<EpicDetails>?
+        val multipleEpicDetails : List<EpicDetail>?
 )
 
-data class EpicDetails (
+data class EpicDetail (
 
         val instrument : Instrument?,
         val dealingRules : DealingRules?,
         val snapshot : Snapshot?
-) {
-    fun toDbo(): EpicDetailsDBO{
-
-        return EpicDetailsDBO(
-                 epicName = instrument?.name
-                , instrument = instrument?.toDbo()
-                , dealingRules = dealingRules?.toDbo()
-                , snapshot = snapshot?.toDbo()
-        )
-    }
-}
+)
 
 data class Instrument (
         var id : UUID? = null,
@@ -107,7 +100,7 @@ data class Instrument (
         val specialInfo : List<String>? = null
 ) {
     constructor(dbo: InstrumentDBO?) : this(
-            id = dbo?.id
+            id = dbo?.getId()
             , epic = dbo?.epic
             , expiry = dbo?.expiry
             , name = dbo?.name
@@ -125,7 +118,7 @@ data class Instrument (
             , marginDepositBands = dbo?.marginDepositBands?.map { MarginDepositBands(it) }
             , marginFactor = dbo?.marginFactor
             , marginFactorUnit = dbo?.marginFactorUnit
-            , slippageFactor = SlippageFactor(dbo?.slippageFactor)
+            , slippageFactor = dbo?.slippageFactor?.let { SlippageFactor(dbo.slippageFactor) }
             , limitedRiskPremium= LimitedRiskPremium(dbo?.limitedRiskPremium)
             , openingHours = dbo?.openingHours
             , expiryDetails = dbo?.expiryDetails
@@ -139,7 +132,7 @@ data class Instrument (
             , specialInfo = dbo?.specialInfo?.map { it.info }
     )
 
-    fun toDbo() : InstrumentDBO{
+    fun toDbo() : InstrumentDBO {
 
         val listCurrencies = mutableListOf<CurrenciesDBO>()
         currencies?.forEach { listCurrencies.add(it.toDbo()) }
@@ -168,7 +161,7 @@ data class Instrument (
                 , marginDepositBands = listMarginDepositBands
                 , marginFactor = marginFactor
                 , marginFactorUnit = marginFactorUnit
-                , slippageFactor = slippageFactor?.toDbo()
+                , slippageFactor = slippageFactor?.let { SlippageFactorDBO(slippageFactor) }
                 , limitedRiskPremium = limitedRiskPremium?.toDbo()
                 , openingHours = openingHours
                 , expiryDetails = expiryDetails
@@ -201,7 +194,7 @@ data class Currencies (
             , isDefault = dbo.isDefault
     )
 
-    fun toDbo(): CurrenciesDBO{
+    fun toDbo(): CurrenciesDBO {
         return CurrenciesDBO(
                 code = code
                 , symbol = symbol
@@ -332,7 +325,6 @@ data class MinNormalStopOrLimitDistance (
 }
 
 data class MinStepDistance (
-
         val unit : String?,
         val value : Int?
 ) {
@@ -345,21 +337,20 @@ data class MinStepDistance (
 }
 
 data class SlippageFactor (
-
-        val unit : String?,
-        val value : Int?
+        val id: UUID? = null,
+        val unit : String,
+        val value : Int
 ) {
-    constructor(dbo: SlippageFactorDBO?) : this(
-            unit = dbo?.unit
-            , value = dbo?.value
+    constructor(dbo: SlippageFactorDBO) : this(
+            id = dbo.getId()
+            , unit = dbo.unit
+            , value = dbo.value
     )
 
-    fun toDbo(): SlippageFactorDBO? {
-        return SlippageFactorDBO(
-                unit = unit
-                , value = value
-        )
-    }
+    constructor(dto : SlippageFactorDTO) : this (
+            unit = dto.unit
+            , value = dto.value
+    )
 }
 
 data class Snapshot (
@@ -397,6 +388,7 @@ data class Snapshot (
     }
 }
 
+//todo check if lastTraded has to be a LocalDateTime
 data class ClosePrice (
 
         val bid : Double?,
@@ -450,7 +442,7 @@ data class OpenPrice (
 }
 
 data class PricesDetails (
-        val instrument: Instrument,
+        val epicName: String,
         val snapshotTime : String?,
         val openPrice : OpenPrice?,
         val closePrice : ClosePrice?,
@@ -459,8 +451,8 @@ data class PricesDetails (
         val lastTradedVolume : Int?
 ) {
 
-    constructor(instrument: Instrument, priceDetailsDTO: PriceDetailsDTO) : this(
-            instrument = instrument
+    constructor(priceDetailsDTO: PriceDetailsDTO, epicName: String) : this(
+            epicName = epicName
             , snapshotTime = priceDetailsDTO.snapshotTime
             , openPrice = priceDetailsDTO.openPrice?.let { OpenPrice(it) }
             , closePrice = priceDetailsDTO.closePrice?.let { ClosePrice(it) }
@@ -470,10 +462,66 @@ data class PricesDetails (
     )
 }
 
+data class OauthToken (
+
+        val access_token : String,
+        val refresh_token : String,
+        val scope : String,
+        val token_type : String,
+        val expires_in : Int,
+        val creationDateTime : LocalDateTime = LocalDateTime.now()
+
+) {
+
+    constructor(oauthTokenDTO: OauthTokenDTO) : this(
+            access_token = oauthTokenDTO.access_token
+            , refresh_token = oauthTokenDTO.refresh_token
+            , scope = oauthTokenDTO.scope
+            , token_type = oauthTokenDTO.token_type
+            , expires_in = oauthTokenDTO.expires_in
+            , creationDateTime = LocalDateTime.now()
+    )
+
+    constructor(oauthTokenDBO: OauthTokenDBO) : this(
+            access_token = oauthTokenDBO.accessToken
+            , refresh_token = oauthTokenDBO.refreshToken
+            , scope = oauthTokenDBO.scope
+            , token_type = oauthTokenDBO.tokenType
+            , expires_in = oauthTokenDBO.expiresIn
+            , creationDateTime = oauthTokenDBO.creationDateTime
+    )
+
+    val expiresDateTime: LocalDateTime = creationDateTime.plusSeconds(expires_in.toLong() -1)
+}
+
+/**
+ * dataPoints will not be used when startDate and endDate are set
+ */
+data class PriceRequest(
+        val epic : String
+        , val resolution: ResolutionDTO = ResolutionDTO.MINUTE
+        , val startDate: LocalDateTime? = null
+        , val endDate: LocalDateTime? = null
+        , val dataPoints: Int = 10
+)
+
+/**
+ * this class helps mocking unit tests, since HttpResponse is hard to mockk
+ */
+data class IGHttpResponse(
+        val responseCode : Int = 200
+        , val headers : Map<String, List<String>>
+        , val body : String
+)
+
 enum class  MarketSearchFilter {
     ALL, SNAPSHOT_ONLY
 }
 
 enum class Resolution {
     MINUTE, MINUTE_2, MINUTE_3, MINUTE_5, MINUTE_10, MINUTE_15, MINUTE_30, HOUR, HOUR_2, HOUR_3, HOUR_4, DAY, WEEK, MONTH
+}
+
+enum class RequestBuildType {
+    PRICEDETAILS, PRICEDETAILSWITHDATE, OAUTHLOGIN, STREAMTOKEN, MARKETNAVIGATION, NODENAVIGATION, MARKETDETAILS
 }

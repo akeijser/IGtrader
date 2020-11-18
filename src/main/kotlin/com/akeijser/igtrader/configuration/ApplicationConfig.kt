@@ -1,12 +1,16 @@
 package com.akeijser.igtrader.configuration
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.core.annotation.Order
+import org.springframework.stereotype.Component
 import org.springframework.validation.annotation.Validated
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
 @ConfigurationProperties(prefix = "application")
 @Validated
+@Component
+@Order(value = 0 )
 class ApplicationConfig {
 
     @Valid
